@@ -15,9 +15,9 @@ if not hasattr(st, 'classifier'):
 
 
 # Configuration for use camera from web deployed server
-# RTC_CONFIGURATION = RTCConfiguration(
-#     {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-# )
+RTC_CONFIGURATION = RTCConfiguration(
+    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+)
 
 
 class VideoProcessor:
@@ -66,7 +66,7 @@ if __name__ == '__main__':
     webrtc_ctx = webrtc_streamer(
         key="WYH",
         mode=WebRtcMode.SENDRECV,
-        # rtc_configuration=RTC_CONFIGURATION,
+        rtc_configuration=RTC_CONFIGURATION,
         video_processor_factory=VideoProcessor,
         media_stream_constraints={"video": True, "audio": False},
         async_processing=False,
