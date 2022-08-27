@@ -7,13 +7,14 @@ from streamlit_webrtc import webrtc_streamer, WebRtcMode, RTCConfiguration
 import av
 
 
-device = 'cpu'
+# trick to load model once at server start
 if not hasattr(st, 'classifier'):
     st.model = torch.hub.load('ultralytics/yolov5', 'yolov5s',  _verbose=False)
+    # if you train your custm model "yolov5s.pt" use the following line
     # st.model = torch.hub.load('ultralytics/yolov5', 'custom', path='yolov5s.pt', _verbose=False)
     
 
-
+# Configuration for use camera from web deployed server
 RTC_CONFIGURATION = RTCConfiguration(
     {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
 )
