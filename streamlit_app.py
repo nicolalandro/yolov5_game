@@ -32,6 +32,7 @@ class VideoProcessor:
 
         # model processing
         im_pil = Image.fromarray(flipped)
+        # return av.VideoFrame.from_ndarray(np.array(im_pil, copy=False), format="bgr24")
         results = st.model(im_pil, size=112)
         bbox_img = np.array(results.render()[0])
 
