@@ -19,6 +19,13 @@ RTC_CONFIGURATION = RTCConfiguration(
     {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
 )
 
+def hit(player, enemy, ray):
+    xp, yp = player
+    xe, ye = enemy
+    dist = np.sqrt((xp - xe)**2 + (yp - ye)**2)
+    return dist < ray
+
+
 def compute_shape(arr):
     cx, cy = arr
     return [cx-10, cy-10, cx+10, cy+10]
@@ -26,6 +33,7 @@ def compute_shape(arr):
 class VideoProcessor:
     points = 0
     enemy = (256, 256)
+    enemy_ray = 20
     player_pos = [50, 50]
 
     def recv(self, frame):
@@ -47,7 +55,7 @@ class VideoProcessor:
         draw.text((28, 36), "Points:" +
                   str(VideoProcessor.points), fill=(255, 0, 0))
 
-        if VideoProcessor.points >= 1:
+        if VideoProcessor.points >= 10:
             draw.text((res_im_pil.width//2, res_im_pil.height//2),
                       "You WIN", fill=(255, 0, 0))
         else:
@@ -64,8 +72,10 @@ class VideoProcessor:
             shape = compute_shape(VideoProcessor.player_pos)
             draw.rectangle(shape, fill ="#ffff33", outline ="red")
                     
-
-                    # if VideoProcessor.enemy[0] > x1 and VideoProcessor.enemy[0] < x2 and \
+            if hit(VideoProcessor.player_pos, VideoProcessor.enemy, VideoProcessor.enemy_ray):
+                VideoProcessor.points += 1
+                VideoProcessor.enemy = list(np.random.randint(512 - 40 , size=2) +20 ) 
+            # if VideoProcessor.enemy[0] > x1 and VideoProcessor.enemy[0] < x2 and \
                     #         VideoProcessor.enemy[1] > y1 and VideoProcessor.enemy[1] < y2:
                     #     VideoProcessor.points += 1
 
