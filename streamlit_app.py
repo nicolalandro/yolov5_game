@@ -19,10 +19,14 @@ RTC_CONFIGURATION = RTCConfiguration(
     {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
 )
 
+def compute_shape(arr):
+    cx, cy = arr
+    return [cx-10, cy-10, cx+10, cy+10]
 
 class VideoProcessor:
     points = 0
     enemy = (256, 256)
+    player_pos = [50, 50]
 
     def recv(self, frame):
         img = frame.to_ndarray(format="bgr24")
@@ -34,11 +38,12 @@ class VideoProcessor:
         im_pil = Image.fromarray(flipped)
         # return av.VideoFrame.from_ndarray(np.array(im_pil, copy=False), format="bgr24")
         results = st.model(im_pil, size=226)
-        bbox_img = np.array(results.render()[0])
+        # bbox_img = np.array(results.render()[0])
+        # res_im_pil = Image.fromarray(bbox_img)
+        res_im_pil = im_pil
 
         # il draw è molto lento
-        res_im_pil = Image.fromarray(bbox_img)
-        draw = ImageDraw.Draw(res_im_pil)
+        draw = ImageDraw.Draw(im_pil)
         draw.text((28, 36), "Points:" +
                   str(VideoProcessor.points), fill=(255, 0, 0))
 
@@ -50,11 +55,19 @@ class VideoProcessor:
 
             for p in results.pred[0]:
                 x1, y1, x2, y2, conf, pred = list(p.numpy())
+                cx,cy = np.abs(x1-x2) / 2 + min([x1, x2]), np.abs(y1-y2) / 2 + min([y1, y2]) 
                 class_name = results.names[int(pred)]
                 if class_name == 'scissors':
-                    if VideoProcessor.enemy[0] > x1 and VideoProcessor.enemy[0] < x2 and \
-                            VideoProcessor.enemy[1] > y1 and VideoProcessor.enemy[1] < y2:
-                        VideoProcessor.points += 1
+                    VideoProcessor.player_pos = [cx, cy]
+                    break
+            
+            shape = compute_shape(VideoProcessor.player_pos)
+            draw.rectangle(shape, fill ="#ffff33", outline ="red")
+                    
+
+                    # if VideoProcessor.enemy[0] > x1 and VideoProcessor.enemy[0] < x2 and \
+                    #         VideoProcessor.enemy[1] > y1 and VideoProcessor.enemy[1] < y2:
+                    #     VideoProcessor.points += 1
 
         # res_im_pil.save('test.png')
         return av.VideoFrame.from_ndarray(np.array(res_im_pil, copy=False), format="bgr24")
