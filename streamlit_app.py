@@ -33,7 +33,7 @@ class VideoProcessor:
         # model processing
         im_pil = Image.fromarray(flipped)
         # return av.VideoFrame.from_ndarray(np.array(im_pil, copy=False), format="bgr24")
-        results = st.model(im_pil, size=112)
+        results = st.model(im_pil, size=226)
         bbox_img = np.array(results.render()[0])
 
         # il draw è molto lento
@@ -51,9 +51,10 @@ class VideoProcessor:
             for p in results.pred[0]:
                 x1, y1, x2, y2, conf, pred = list(p.numpy())
                 class_name = results.names[int(pred)]
-                if VideoProcessor.enemy[0] > x1 and VideoProcessor.enemy[0] < x2 and \
-                        VideoProcessor.enemy[1] > y1 and VideoProcessor.enemy[1] < y2:
-                    VideoProcessor.points += 1
+                if class_name == 'scissors':
+                    if VideoProcessor.enemy[0] > x1 and VideoProcessor.enemy[0] < x2 and \
+                            VideoProcessor.enemy[1] > y1 and VideoProcessor.enemy[1] < y2:
+                        VideoProcessor.points += 1
 
         # res_im_pil.save('test.png')
         return av.VideoFrame.from_ndarray(np.array(res_im_pil, copy=False), format="bgr24")
