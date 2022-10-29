@@ -19,6 +19,7 @@ RTC_CONFIGURATION = RTCConfiguration(
     {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
 )
 
+
 def hit(player, enemy, ray):
     xp, yp = player
     xe, ye = enemy
@@ -33,6 +34,7 @@ def compute_shape(arr):
 class VideoProcessor:
     points = 0
     enemy = (256, 256)
+    enemy2 = (400, 400)
     enemy_ray = 20
     player_pos = [50, 50]
 
@@ -58,8 +60,12 @@ class VideoProcessor:
         if VideoProcessor.points >= 10:
             draw.text((res_im_pil.width//2, res_im_pil.height//2),
                       "You WIN", fill=(255, 0, 0))
+        elif VideoProcessor.points < 0:
+            draw.text((res_im_pil.width//2, res_im_pil.height//2),
+                      "You Louse", fill=(255, 0, 0))
         else:
             draw.text(VideoProcessor.enemy, "ENEMY", fill=(255, 0, 0))
+            draw.text(VideoProcessor.enemy2, "ENEMY", fill=(0, 0, 255))
 
             for p in results.pred[0]:
                 x1, y1, x2, y2, conf, pred = list(p.numpy())
@@ -74,7 +80,15 @@ class VideoProcessor:
                     
             if hit(VideoProcessor.player_pos, VideoProcessor.enemy, VideoProcessor.enemy_ray):
                 VideoProcessor.points += 1
-                VideoProcessor.enemy = list(np.random.randint(512 - 40 , size=2) +20 ) 
+                VideoProcessor.enemy = list(np.random.randint(475 - 40 , size=2) +20 ) 
+                VideoProcessor.enemy2 = list(np.random.randint(475 - 40 , size=2) +20 ) 
+                print(VideoProcessor.enemy, VideoProcessor.enemy2)
+            if hit(VideoProcessor.player_pos, VideoProcessor.enemy2, VideoProcessor.enemy_ray):
+                VideoProcessor.points -=1
+                VideoProcessor.enemy = list(np.random.randint(475 - 40 , size=2) +20 ) 
+                VideoProcessor.enemy2 = list(np.random.randint(475 - 40 , size=2) +20 ) 
+                print(VideoProcessor.enemy, VideoProcessor.enemy2)
+
             # if VideoProcessor.enemy[0] > x1 and VideoProcessor.enemy[0] < x2 and \
                     #         VideoProcessor.enemy[1] > y1 and VideoProcessor.enemy[1] < y2:
                     #     VideoProcessor.points += 1
